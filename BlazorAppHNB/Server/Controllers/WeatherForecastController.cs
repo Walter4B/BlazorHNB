@@ -1,4 +1,5 @@
 using BlazorAppHNB.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorAppHNB.Server.Controllers

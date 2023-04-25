@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using BlazorAppHNB.Client.Authentication;
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navManager
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +10,14 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <AuthorizeView>
+            <Authorized>
+                <a @onclick="Logout" href="javascript:void(o)">Logout</a>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/login">Login</a>
+            </NotAuthorized>
+        </AuthorizeView>
         </div>
 
         <article class="content px-4">
@@ -15,3 +25,12 @@
         </article>
     </main>
 </div>
+
+@code{
+        private async Task Logout()
+        {
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+            await customAuthenticationStateProvider.UpdateAuthnticationState(null);
+            navManager.NavigateTo("/login", true);
+        }
+}

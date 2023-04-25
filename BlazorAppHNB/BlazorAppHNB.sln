@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppHNB.Server", "Server\BlazorAppHNB.Server.csproj", "{EA737FC0-92E1-480E-81F0-3DEF091D616F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorAppHNB.Server", "Server\BlazorAppHNB.Server.csproj", "{EA737FC0-92E1-480E-81F0-3DEF091D616F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppHNB.Client", "Client\BlazorAppHNB.Client.csproj", "{50C98DB5-C8FA-4A94-B2BD-7F10FEA7AA88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorAppHNB.Client", "Client\BlazorAppHNB.Client.csproj", "{50C98DB5-C8FA-4A94-B2BD-7F10FEA7AA88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppHNB.Shared", "Shared\BlazorAppHNB.Shared.csproj", "{4117133D-450E-4713-9339-CEC597242CE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorAppHNB.Shared", "Shared\BlazorAppHNB.Shared.csproj", "{4117133D-450E-4713-9339-CEC597242CE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
