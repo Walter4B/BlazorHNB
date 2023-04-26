@@ -11,11 +11,11 @@ namespace BlazorAppHNB.Server.Authentication
         public const string JWT_SECURITY_KEY = "HG95fGp0THavQb6vvVhu3xGku2lOqXcrP06m1z";
         private const int JWT_TOKEN_VALIDITY_MINS = 60;
 
-        private UserAccountService userAccountService;
+        private UserAccountService _userAccountService;
 
-        public JwtAuthenticationManager(UserAccountService userAccountServicePassed)
+        public JwtAuthenticationManager(UserAccountService userAccountService)
         {
-            userAccountService = userAccountServicePassed;
+            _userAccountService = userAccountService;
         }
 
         public UserSession? GenerateJwtToken(string userName, string password)
@@ -25,7 +25,7 @@ namespace BlazorAppHNB.Server.Authentication
                 return null;
             }
 
-            var userAccount = userAccountService.GetUserAccountByUserName(userName);
+            var userAccount = _userAccountService.GetUserAccountByUserName(userName);
             if (userAccount == null || userAccount.Password != password) 
             {
                 return null;

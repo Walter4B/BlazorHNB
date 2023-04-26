@@ -2,6 +2,7 @@ using BlazorAppHNB.Server.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
+using System.Net.NetworkInformation;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,14 @@ builder.Services.AddAuthentication(o =>
             };
         });
 builder.Services.AddSingleton<UserAccountService>();
+builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: "CorsPolicy",
+        policy =>
+        {
+            policy.WithOrigins("https://api.hnb.hr/tecajn-eur/v3");
+        });
+    });
 
 var app = builder.Build();
 
@@ -43,6 +52,7 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseCors("CorsPolicy");
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();

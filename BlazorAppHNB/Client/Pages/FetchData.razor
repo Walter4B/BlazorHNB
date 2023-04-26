@@ -3,16 +3,17 @@
 @using BlazorAppHNB.Client.Authentication;
 @using BlazorAppHNB.Shared
 @using System.Net.Http.Headers;
+@using System.Net.Http.Json;
+@using System.Text.Json;
 @using static System.Net.WebRequestMethods;
-@inject HttpClient Http
+@inject HttpClient http
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navManager
 
-<PageTitle>Weather forecast</PageTitle>
+<PageTitle>Currency List</PageTitle>
 
 
-
-@if (forecasts == null)
+@if (currency == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -21,28 +22,62 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>Broj tečajnice</th>
+                <th>Datum primjene</th>
+                <th>Država</th>
+                <th>Država_ISO</th>
+                <th>Šifra valute</th>
+                <th>Valuta</th>
+                <th>Kupovni tečaj</th>
+                <th>Srednji tečaj</th>
+                <th>Prodajni tečaj</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var cur in currency)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@cur.broj_tecajnice</td>
+                    <td>@cur.datum_primjene.ToShortDateString()</td>
+                    <td>@cur.drzava</td>
+                    <td>@cur.drzava_iso</td>
+                    <td>@cur.sifra_valute</td>
+                    <td>@cur.valuta</td>
+                    <td>@cur.kupovni_tecaj</td>
+                    <td>@cur.srednji_tecaj</td>
+                    <td>@cur.prodajni_tecaj</td>
                 </tr>
             }
         </tbody>
     </table>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Amount in Euro</th>
+                <th>Amount in PZL</th>
+                <th>Amount in USD</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" @bind="@TextBoxEuro" @bind:event="oninput"/></td>
+                <td><div class="currencyBox">@PZLAmount</div></td>
+                <td><p class="currencyBox">@USDAmount</p></td>
+            </tr>
+        </tbody>
+    </table>
 }
 
+
 @code {
-    private WeatherForecast[]? forecasts;
+    decimal TextBoxEuro;
+    decimal? PZLAmount;
+    decimal? USDAmount;
+
+    decimal? PZLMod = 1;
+    decimal? USDMod = 2;
+
+    private List<Currency>? currency;
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,12 +87,27 @@ else
 
         if (!string.IsNullOrWhiteSpace(token))
         {
-            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-            forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         }
         else
         {
             navManager.NavigateTo("/login");
         }
+
+        var resp = await http.GetAsync("Currency");
+        if (resp.IsSuccessStatusCode)
+        {
+            var data = await resp.Content.ReadAsStreamAsync();
+            currency = JsonSerializer.Deserialize<List<Currency>>(data);
+        }
+
+    }
+
+    private void OnInput(decimal value)
+    {
+        TextBoxEuro = value;
+        PZLAmount = value * PZLMod;
+        USDAmount = value * USDMod;
     }
 }
+

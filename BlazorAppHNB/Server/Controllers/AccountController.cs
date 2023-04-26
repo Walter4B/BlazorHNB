@@ -10,11 +10,11 @@ namespace BlazorAppHNB.Server.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private UserAccountService userAccountService;
+        private UserAccountService _userAccountService;
 
-        public AccountController(UserAccountService userAccountServicePara)
+        public AccountController(UserAccountService userAccountService)
         {
-            userAccountService = userAccountServicePara;
+            _userAccountService = userAccountService;
         }
 
         [HttpPost]
@@ -22,7 +22,7 @@ namespace BlazorAppHNB.Server.Controllers
         [AllowAnonymous]
         public ActionResult<UserSession> Login([FromBody] LoginRequest loginRequest)
         {
-            var jwtAuthenticationManager = new JwtAuthenticationManager(userAccountService);
+            var jwtAuthenticationManager = new JwtAuthenticationManager(_userAccountService);
             var userSession = jwtAuthenticationManager.GenerateJwtToken(loginRequest.UserName, loginRequest.Password);
             if (userSession is null)
             {

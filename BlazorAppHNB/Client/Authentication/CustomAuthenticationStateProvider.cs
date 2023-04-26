@@ -10,19 +10,19 @@ namespace BlazorAppHNB.Client.Authentication
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly ISessionStorageService sessionStorage;
+        private readonly ISessionStorageService _sessionStorage;
         private ClaimsPrincipal anon = new ClaimsPrincipal(new ClaimsPrincipal());
 
-        public CustomAuthenticationStateProvider(ISessionStorageService sessionStoragePara)
+        public CustomAuthenticationStateProvider(ISessionStorageService sessionStorage)
         { 
-            sessionStorage= sessionStoragePara;
+            _sessionStorage= sessionStorage;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             try
             {
-                var userSession = await sessionStorage.ReadEncrypredItemAsync<UserSession>("UserSession");
+                var userSession = await _sessionStorage.ReadEncrypredItemAsync<UserSession>("UserSession");
                 if (userSession == null)
                 {
                     return new AuthenticationState(anon);
@@ -52,12 +52,12 @@ namespace BlazorAppHNB.Client.Authentication
                 }));
 
                 userSession.ExpiryTime = DateTime.Now.AddSeconds(userSession.ExpiresIn);
-                await sessionStorage.SaveItemEncrypredAsync("UserSession", userSession);
+                await _sessionStorage.SaveItemEncrypredAsync("UserSession", userSession);
             }
             else 
             {
                 claimsPrincipal = anon;
-                await sessionStorage.RemoveItemAsync("UserSession");
+                await _sessionStorage.RemoveItemAsync("UserSession");
             }
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
@@ -69,7 +69,7 @@ namespace BlazorAppHNB.Client.Authentication
 
             try 
             {
-                var userSession = await sessionStorage.ReadEncrypredItemAsync<UserSession>("UserSession");
+                var userSession = await _sessionStorage.ReadEncrypredItemAsync<UserSession>("UserSession");
                 if (userSession != null && DateTime.Now < userSession.ExpiryTime)
                 {
                     result = userSession.Token;
