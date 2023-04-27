@@ -4,9 +4,13 @@
 @using BlazorAppHNB.Shared
 @using System.Net.Http.Headers;
 @using System.Net.Http.Json;
+@using Newtonsoft.Json;
 @using System.Text.Json;
+@using System.Text.Json.Serialization
 @using static System.Net.WebRequestMethods;
+@using BlazorAppHNB.Client.Services;
 @inject HttpClient http
+@inject DataService dataService
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navManager
 
@@ -60,9 +64,9 @@ else
         </thead>
         <tbody>
             <tr>
-                <td><input type="number" @bind="@TextBoxEuro" @bind:event="oninput"/></td>
-                <td><div class="currencyBox">@PZLAmount</div></td>
-                <td><p class="currencyBox">@USDAmount</p></td>
+                <td><input type="number" @bind="euroAmount" @oninput="OnInput"/></td>
+                <td><div class="currencyBox">@plnAmount</div></td>
+                <td><p class="currencyBox">@usdAmount</p></td>
             </tr>
         </tbody>
     </table>
@@ -70,17 +74,17 @@ else
 
 
 @code {
-    decimal TextBoxEuro;
-    decimal? PZLAmount;
-    decimal? USDAmount;
+    public decimal euroAmount;
+    public decimal plnAmount;
+    public decimal usdAmount;
 
-    decimal? PZLMod = 1;
-    decimal? USDMod = 2;
+    decimal PLNMod = 1.0m;
+    decimal USDMod = 1.0m;
 
-    private List<Currency>? currency;
+    private List<Currency> currency = new List<Currency>();
 
     protected override async Task OnInitializedAsync()
-    {
+    { 
         var customAuthStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
 
         var token = await customAuthStateProvider.GetToken();
@@ -94,20 +98,48 @@ else
             navManager.NavigateTo("/login");
         }
 
-        var resp = await http.GetAsync("Currency");
-        if (resp.IsSuccessStatusCode)
+        try
         {
-            var data = await resp.Content.ReadAsStreamAsync();
-            currency = JsonSerializer.Deserialize<List<Currency>>(data);
+            currency = await dataService.FatchData();
+            GetMods();
         }
-
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
-    private void OnInput(decimal value)
+    private void OnInput(ChangeEventArgs e)
     {
-        TextBoxEuro = value;
-        PZLAmount = value * PZLMod;
-        USDAmount = value * USDMod;
+        if (e != null && e.Value != null)
+        {
+            var value = e.Value.ToString();
+
+            if (decimal.TryParse(value, out euroAmount))
+            {
+                plnAmount = euroAmount * PLNMod;
+                usdAmount = euroAmount * USDMod;
+            }
+            else
+            {
+                euroAmount = plnAmount = usdAmount = 0;
+            }
+        }
+    }
+
+    private void GetMods()
+    {
+        foreach (Currency c in currency)
+        {
+            if (c.valuta == "PLN")
+            {
+                PLNMod = c.srednji_tecaj;    
+            }
+            if (c.valuta == "USD")
+            {
+                USDMod = c.srednji_tecaj;
+            }
+        }
     }
 }
 

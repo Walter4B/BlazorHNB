@@ -2,6 +2,7 @@
 @using BlazorAppHNB.Client.Authentication;
 @using BlazorAppHNB.Shared;
 @using System.Net;
+@using BCrypt;
 @inject HttpClient httpClient
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authenticationStateProvider
@@ -14,11 +15,11 @@
         </div>
         <div class="mb-3">
             <label>Username</label>
-            <input @bind="loginRequest.UserName" class="form-control" placeholder="Username" />
+            <input @bind="user" class="form-control" placeholder="Username" />
         </div>
         <div class="mb-3">
             <label>Password</label>
-            <input @bind="loginRequest.Password" type="password" class="form-control" placeholder="Password"/>
+            <input @bind="password" type="password" class="form-control" placeholder="Password"/>
         </div>
         <div class="mb-3 d-grid gap-2">
             <button @onclick="Authenticate" class="btn btn-primary">Login</button>
@@ -27,10 +28,15 @@
 </div>
 
 @code {
+    private string user;
+    private string password;
+
     private LoginRequest loginRequest = new LoginRequest();
 
     private async Task Authenticate()
     {
+        loginRequest.UserName = user;
+        loginRequest.Password = BCrypt.Net.BCrypt.HashPassword(password);
         var loginResponse = await httpClient.PostAsJsonAsync<LoginRequest>("/api/Account/Login", loginRequest);
 
         if (loginResponse.IsSuccessStatusCode)

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using BlazorAppHNB.Client.Authentication;
+using BlazorAppHNB.Client.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -16,7 +17,10 @@ builder.Services.AddScoped(
     });
 
 builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddScoped<DataService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddAuthorizationCore();
 
 await builder.Build().RunAsync();
+
+

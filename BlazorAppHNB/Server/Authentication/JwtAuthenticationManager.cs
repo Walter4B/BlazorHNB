@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BCrypt.Net;
 
 namespace BlazorAppHNB.Server.Authentication
 {
@@ -26,7 +27,8 @@ namespace BlazorAppHNB.Server.Authentication
             }
 
             var userAccount = _userAccountService.GetUserAccountByUserName(userName);
-            if (userAccount == null || userAccount.Password != password) 
+            Console.WriteLine(password);
+            if (userAccount == null || !BCrypt.Net.BCrypt.Verify(userAccount.Password, password)) 
             {
                 return null;
             }

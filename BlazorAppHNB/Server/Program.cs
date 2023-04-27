@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Net.NetworkInformation;
 using System.Text;
 
+var CorsPolicy = "_corsPolicy";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -28,15 +29,18 @@ builder.Services.AddAuthentication(o =>
             };
         });
 builder.Services.AddSingleton<UserAccountService>();
+builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
     {
-        options.AddPolicy(name: "CorsPolicy",
+        options.AddPolicy(name: CorsPolicy,
         policy =>
         {
-            policy.WithOrigins("https://api.hnb.hr/tecajn-eur/v3");
+            policy.WithOrigins("https://api.hnb.hr/tecajn-eur/v3")
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
         });
     });
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -52,18 +56,19 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors(CorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+app.UseEndpoints(endpoint => endpoint.MapDefaultControllerRoute());
 app.MapFallbackToFile("index.html");
 
 app.Run();
